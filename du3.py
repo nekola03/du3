@@ -1,5 +1,7 @@
-from pyproj import transformer
+from pyproj import Transformer, CRS
 import json
+
+wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514), always_xy=True)
 
 def loadGeoJson(inputJSON):
     try:
@@ -14,3 +16,15 @@ def loadGeoJson(inputJSON):
         print("ahoj světe")
     except PermissionError:
         print("ahoj světe")
+
+def getdataAdress(inputAdress):
+    adress = {}
+    for feature in inputAdress:
+        street = feature["properties"]["addr:street"]
+        houseNumber = feature["properties"]["addr:housenumber"]
+        fullAdress = street + "" + houseNumber
+        wgsLat = feature["geometry"]["coordinates"][1]
+        wgsLon = feature["geometry"]["coordinates"][0]
+        adress[fullAdress] = wgs2jtsk.transform(wgsLat,wgsLon)
+    return adress
+
