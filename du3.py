@@ -17,7 +17,7 @@ def loadGeoJson(inputJSON):
     except PermissionError:
         print("ahoj světe")
 
-def getdataAdress(inputAdress):
+def getDataAdress(inputAdress):
     adress = {}
     for feature in inputAdress:
         street = feature["properties"]["addr:street"]
@@ -27,4 +27,11 @@ def getdataAdress(inputAdress):
         wgsLon = feature["geometry"]["coordinates"][0]
         adress[fullAdress] = wgs2jtsk.transform(wgsLat,wgsLon)
     return adress
+
+def getDataConteiners(inputConteners):
+    conteiners = {}
+    for feature in inputConteners:
+        fullAdress = feature["properties"]["STATIONNAME"]
+        wgsLat = feature["geometry"]["coordinates"][1]
+        wgsLon = feature["geometry"]["coordinates"][0]
 
