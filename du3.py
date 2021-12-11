@@ -32,6 +32,9 @@ def getDataConteiners(inputConteners):
     conteiners = {}
     for feature in inputConteners:
         fullAdress = feature["properties"]["STATIONNAME"]
-        wgsLat = feature["geometry"]["coordinates"][1]
-        wgsLon = feature["geometry"]["coordinates"][0]
+        wgs = feature["geometry"]["coordinates"]
+        if feature["properties"]["PRISTUP"] == "volně":
+            conteiners[fullAdress] = wgs
+    return conteiners
+
 
