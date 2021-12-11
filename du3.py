@@ -2,9 +2,6 @@ from pyproj import Transformer, CRS
 import json
 from math import sqrt
 
-
-wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514), always_xy=True)
-
 #FUNKCE PRO NAČTENÍ GEOJSONU
 def loadGeoJson(inputJSON):
     try:
@@ -50,16 +47,12 @@ def distanceFigure(x,y):
 #VÝPOČET VZDÁLENOSTI OD ADRES K JEDNOTLIVÝM VEŘEJNÝM KONTEJNERŮM
 def distance(adress, conteiners):
     distances = {}
-    for (adress_street, adress_coor) in adress:
+    for (adressesAd, coordinatesAd) in adress.items():
         onGoing = 10000
-        for (conteinters_coor) in conteiners:
-            finalDistance = distanceFigure(adress_coor, conteinters_coor)
-            if finalDistance > 10000:
-                print("Maximální vzdálenost mezi kontejnery")
-                exit()
-            elif finalDistance <= onGoing:
-                onGoing = finalDistance
-        distances[adress_street] = onGoing
+        for (_,coordinatesCo) in conteiners.items():
+            finalDistance = distanceFigure(coordinatesAd, coordinatesCo)
+            onGoing = finalDistance
+        distances[adressesAd] = onGoing
     return distances
 
 #SAMOTNÝ PRŮBĚH KÓDU
@@ -68,6 +61,11 @@ adress = "adresy.geojson"
 
 conteiners = loadGeoJson(conteiners)
 adress = loadGeoJson(adress)
-
+wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514))
 generalizeAdress = getDataAdress(adress)
 generalizeConteiners = getDataConteiners(conteiners)
+
+takeDistances = distance(generalizeAdress,generalizeConteiners)
+averageDistance = sum(takeDistances.values()) / len(takeDistances)
+
+print(averageDistance)
