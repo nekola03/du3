@@ -1,5 +1,7 @@
 from pyproj import Transformer, CRS
 import json
+from math import sqrt
+
 
 wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514), always_xy=True)
 
@@ -37,4 +39,17 @@ def getDataConteiners(inputConteners):
             conteiners[fullAdress] = wgs
     return conteiners
 
+def distanceFigure(x,y):
+    distance = sqrt(((x[0] - y[0])**2) + ((x[1] - y[1])**2))
+    return distance
 
+
+
+conteiners = "kontejnery.geojson"
+adress = "adresy.geojson"
+
+conteiners = loadGeoJson(conteiners)
+adress = loadGeoJson(adress)
+
+generalizeAdress = getDataAdress(adress)
+generalizeConteiners = getDataConteiners(conteiners)
