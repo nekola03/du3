@@ -43,6 +43,16 @@ def distanceFigure(x,y):
     distance = sqrt(((x[0] - y[0])**2) + ((x[1] - y[1])**2))
     return distance
 
+def distance(adress, conteiners):
+    for (adress_street, adress_coor) in adress:
+        for (conteiners_street, conteinters_coor) in conteiners:
+            finalDistance = distanceFigure(adress_coor, conteinters_coor)
+            if finalDistance > 10000:
+                print("Maximální vzdálenost mezi kontejnery")
+            else:
+                
+
+
 
 
 conteiners = "kontejnery.geojson"
