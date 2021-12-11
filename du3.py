@@ -5,6 +5,7 @@ from math import sqrt
 
 wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514), always_xy=True)
 
+#FUNKCE PRO NAČTENÍ GEOJSONU
 def loadGeoJson(inputJSON):
     try:
         with open(inputJSON,encoding="UTF-8") as openedJSON:
@@ -19,6 +20,7 @@ def loadGeoJson(inputJSON):
     except PermissionError:
         print("ahoj světe")
 
+#VÝBĚR A ÚPRAVA ATRIBUTŮ V SOUBORU S ADRESAMI
 def getDataAdress(inputAdress):
     adress = {}
     for feature in inputAdress:
@@ -30,6 +32,7 @@ def getDataAdress(inputAdress):
         adress[fullAdress] = wgs2jtsk.transform(wgsLat,wgsLon)
     return adress
 
+#VÝBĚR A ÚPRAVA ATRIBUTŮ V SOUBORU S KONTEJNERY
 def getDataConteiners(inputConteners):
     conteiners = {}
     for feature in inputConteners:
@@ -39,10 +42,12 @@ def getDataConteiners(inputConteners):
             conteiners[fullAdress] = wgs
     return conteiners
 
+#VZOREC PRO VÝPOČET VZDÁLENOSTI
 def distanceFigure(x,y):
     distance = sqrt(((x[0] - y[0])**2) + ((x[1] - y[1])**2))
     return distance
 
+#VÝPOČET VZDÁLENOSTI OD ADRES K JEDNOTLIVÝM VEŘEJNÝM KONTEJNERŮM
 def distance(adress, conteiners):
     distances = {}
     for (adress_street, adress_coor) in adress:
@@ -57,11 +62,7 @@ def distance(adress, conteiners):
         distances[adress_street] = onGoing
     return distances
 
-
-
-
-
-
+#SAMOTNÝ PRŮBĚH KÓDU
 conteiners = "kontejnery.geojson"
 adress = "adresy.geojson"
 
