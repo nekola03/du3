@@ -44,13 +44,20 @@ def distanceFigure(x,y):
     return distance
 
 def distance(adress, conteiners):
+    distances = {}
     for (adress_street, adress_coor) in adress:
-        for (conteiners_street, conteinters_coor) in conteiners:
+        onGoing = 10000
+        for (conteinters_coor) in conteiners:
             finalDistance = distanceFigure(adress_coor, conteinters_coor)
             if finalDistance > 10000:
                 print("Maximální vzdálenost mezi kontejnery")
-            else:
-                
+                exit()
+            elif finalDistance <= onGoing:
+                onGoing = finalDistance
+        distances[adress_street] = onGoing
+    return distances
+
+
 
 
 
