@@ -23,7 +23,7 @@ def getDataAdress(inputAdress):
     for feature in inputAdress:
         street = feature["properties"]["addr:street"]
         houseNumber = feature["properties"]["addr:housenumber"]
-        fullAdress = street + "" + houseNumber
+        fullAdress = street + " " + houseNumber
         wgs = feature["geometry"]["coordinates"]
         jtsk = wgs2jtsk.transform(wgs[0],wgs[1])
         adress[fullAdress] = jtsk
@@ -51,11 +51,16 @@ def distance(adress, conteiners):
         onGoing = 10000
         for (_,coordinatesCo) in conteiners.items():
             finalDistance = distanceFigure(coordinatesAd, coordinatesCo)
-            #repair
-            onGoing = finalDistance
+            if (finalDistance >= 100000):
+                print(f"Vzdálenost nejbližšího kontejneru od adresy {adressesAd} je větší než 10 km.")
+                print("!!!Program končí!!!")   
+            elif (finalDistance < onGoing):
+                onGoing = finalDistance
+                print(finalDistance)
         distances[adressesAd] = onGoing
     return distances
 
+#VÝBĚR NEJVZDÁLENĚJŠÍHO KONTEJNERU
 def maxDistance(distances):
     maximDistance = max(distances.values())
     for (adress, dis) in distances.items():
@@ -63,10 +68,29 @@ def maxDistance(distances):
             maxstreet = adress
     return maxstreet, maximDistance
 
+def median(distances):
+    distancesList = []
+    for (_,dis) in distances.items():
+        distancesList.append(dis)
+    distancesList.sort()
+    if ((len(distancesList) % 2) == 0):
+        medPositionLower = int((len(distancesList) - 2) / 2)
+        medPositionHigher = int((len(distancesList) + 2) / 2)
+        medValueLower = distancesList[medPositionLower]
+        medValueHigher =  distancesList[medPositionHigher]
+        medValue = (medValueLower + medValueHigher) / 2
+    elif ((len(distancesList) % 2) == 1):
+        medPositionLower = int((len(distancesList) - 1) / 2)
+        medPositionHigher = int((len(distancesList) + 1) / 2)
+        medValueLower = distancesList[medPositionLower]
+        medValueHigher =  distancesList[medPositionHigher]
+        medValue = (medValueLower + medValueHigher) / 2
+    return medValue
+
 
 #SAMOTNÝ PRŮBĚH KÓDU
-conteiners = "kontejnery.geojson"
-adress = "adresy.geojson"
+conteiners = "kontejnery1.geojson"
+adress = "adresy1.geojson"
 
 conteiners = loadGeoJson(conteiners)
 adress = loadGeoJson(adress)
@@ -75,11 +99,11 @@ generalizeAdress = getDataAdress(adress)
 generalizeConteiners = getDataConteiners(conteiners)
 
 takeDistances = distance(generalizeAdress,generalizeConteiners)
-averageDistance = sum(takeDistances.values()) / len(takeDistances)
-
+averageDistance = sum(takeDistances.values()) / len(takeDistances) 
 maxstreet = maxDistance(takeDistances)
 
 print(f"Nacteno {len(generalizeAdress)} adresnich bodu.")
 print(f"Nacteno {len(generalizeConteiners)} kontejneru na trideny odpad.\n")
-print(f"Prumerna vzdalenost ke kontejneru je {averageDistance} m.")
+print(f"Prumerna vzdalenost ke kontejneru je {median(takeDistances)} m.")
+print(f"Medián vzdálenosti ke kontejneru je {averageDistance} m.")
 print(f"Nejdale ke kontejneru je z adresy {maxstreet[0]} a to {maxstreet[1]} m.\n")
