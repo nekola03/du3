@@ -37,6 +37,7 @@ def getDataConteiners(inputConteners):
         wgs = feature["geometry"]["coordinates"]
         if feature["properties"]["PRISTUP"] == "volně": # výběr pouze těch kontejnerů, které mají volný přístup
             conteiners[fullAdress] = wgs
+    
     return conteiners
 
 #VÝPOČET VZDÁLENOSTI OD ADRES K JEDNOTLIVÝM VEŘEJNÝM KONTEJNERŮM
@@ -46,12 +47,12 @@ def distance(adress, conteiners):
         onGoing = 10000 #proměnná s, která bude přepisována dle 
         for (_,coordinatesCo) in conteiners.items():
             finalDistance = sqrt(((coordinatesAd[0] - coordinatesCo[0])**2) + ((coordinatesAd[1] - coordinatesCo[1])**2)) #výpočet vzdálenosti na základě Pythagovovi věty
-            if (finalDistance >= 100000): #v případě vzdálenosti ke kontejneru větší než 10 km, program skončí
-                print(f"Vzdálenost veřejného kontejneru od adresy {adressesAd} je větší než 10 km.")
-                print("!!!Program končí!!!")   
-                exit()
-            elif (finalDistance < onGoing): #neustále se zjišťuje vzdálenost k nejbližšímu kontejneru a přepíše se v proměnné onGoing
+            if (finalDistance < onGoing): #neustále se zjišťuje vzdálenost k nejbližšímu kontejneru a přepíše se v proměnné onGoing
                 onGoing = finalDistance
+        if (onGoing >= 10000): #v případě vzdálenosti ke kontejneru větší než 10 km, program skončí
+            print(f"Vzdálenost veřejného kontejneru od adresy {adressesAd} je větší než 10 km.")
+            print("!!!Program končí!!!")   
+            exit()
         distances[adressesAd] = onGoing #každá asresa se spojí vždy s nejbližší vzdáleností k veřejnému kontejneru
     return distances
 
@@ -103,6 +104,6 @@ maxstreet = maxDistance(takeDistances)
 #tisk všech výstupů
 print(f"Nacteno {len(generalizeAdress)} adresnich bodu.")
 print(f"Nacteno {len(generalizeConteiners)} kontejneru na trideny odpad.\n")
-print(f"Prumerna vzdalenost ke kontejneru je {median(takeDistances)} m.") #vstup do mediánu z prověné takeDistances
-print(f"Medián vzdálenosti ke kontejneru je {averageDistance} m.")
-print(f"Nejdale ke kontejneru je z adresy {maxstreet[0]} a to {maxstreet[1]} m.\n")
+print(f"Prumerna vzdalenost ke kontejneru je {median(takeDistances):.0f} m.") #vstup do mediánu z prověné takeDistances
+print(f"Medián vzdálenosti ke kontejneru je {averageDistance:.0f} m.")
+print(f"Nejdale ke kontejneru je z adresy {maxstreet[0]} a to {maxstreet[1]:.0f} m.\n")
