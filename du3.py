@@ -9,13 +9,13 @@ def loadGeoJson(inputJSON):
             file = json.load(openedJSON) ["features"]
             return file
     except FileNotFoundError:
-        print("Soubor nemohl být načtený z důvodu nevalidníhi vstupního souboru")
+        print(f"Soubor {inputJSON} nebyl nalezen!!")
     except RuntimeError:
-        print("ahoj světe")
+        pass
     except ValueError:
-        print("ahoj světe")
+        print(f"Soubor {inputJSON} obsahuje chybné hodnoty")
     except PermissionError:
-        print("ahoj světe")
+        print(f"Přístup k souboru {inputJSON} byl zamítnut")
 
 #VÝBĚR A ÚPRAVA ATRIBUTŮ V SOUBORU S ADRESAMI
 def getDataAdress(inputAdress):
@@ -24,9 +24,9 @@ def getDataAdress(inputAdress):
         street = feature["properties"]["addr:street"]
         houseNumber = feature["properties"]["addr:housenumber"]
         fullAdress = street + "" + houseNumber
-        wgsLat = feature["geometry"]["coordinates"][1]
-        wgsLon = feature["geometry"]["coordinates"][0]
-        adress[fullAdress] = wgs2jtsk.transform(wgsLat,wgsLon)
+        wgs = feature["geometry"]["coordinates"]
+        jtsk = wgs2jtsk.transform(wgs[0],wgs[1])
+        adress[fullAdress] = jtsk
     return adress
 
 #VÝBĚR A ÚPRAVA ATRIBUTŮ V SOUBORU S KONTEJNERY
@@ -51,9 +51,18 @@ def distance(adress, conteiners):
         onGoing = 10000
         for (_,coordinatesCo) in conteiners.items():
             finalDistance = distanceFigure(coordinatesAd, coordinatesCo)
+            #repair
             onGoing = finalDistance
         distances[adressesAd] = onGoing
     return distances
+
+def maxDistance(distances):
+    maximDistance = max(distances.values())
+    for (adress, dis) in distances.items():
+        if dis == maximDistance:
+            maxstreet = adress
+    return maxstreet, maximDistance
+
 
 #SAMOTNÝ PRŮBĚH KÓDU
 conteiners = "kontejnery.geojson"
@@ -61,11 +70,16 @@ adress = "adresy.geojson"
 
 conteiners = loadGeoJson(conteiners)
 adress = loadGeoJson(adress)
-wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514))
+wgs2jtsk = Transformer.from_crs(CRS.from_epsg(4326), CRS.from_epsg(5514), always_xy=True)
 generalizeAdress = getDataAdress(adress)
 generalizeConteiners = getDataConteiners(conteiners)
 
 takeDistances = distance(generalizeAdress,generalizeConteiners)
 averageDistance = sum(takeDistances.values()) / len(takeDistances)
 
-print(averageDistance)
+maxstreet = maxDistance(takeDistances)
+
+print(f"Nacteno {len(generalizeAdress)} adresnich bodu.")
+print(f"Nacteno {len(generalizeConteiners)} kontejneru na trideny odpad.\n")
+print(f"Prumerna vzdalenost ke kontejneru je {averageDistance} m.")
+print(f"Nejdale ke kontejneru je z adresy {maxstreet[0]} a to {maxstreet[1]} m.\n")
