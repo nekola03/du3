@@ -37,10 +37,9 @@ def getDataConteiners(inputConteners):
         wgs = feature["geometry"]["coordinates"]
         if feature["properties"]["PRISTUP"] == "volně": # výběr pouze těch kontejnerů, které mají volný přístup
             conteiners[fullAdress] = wgs
-    
     return conteiners
 
-#VÝPOČET VZDÁLENOSTI OD ADRES K JEDNOTLIVÝM VEŘEJNÝM KONTEJNERŮM
+#VÝPOČET VZDÁLENOSTI OD ADRES K NEJBLIŽŠÍMU VEŘEJNÉMU KONTEJNERU
 def distance(adress, conteiners):
     distances = {}
     for (adressesAd, coordinatesAd) in adress.items():
@@ -81,7 +80,7 @@ def median(distances):
     medValue = (medValueLower + medValueHigher) / 2 #výpočet průměru z okolních hodnot
     return medValue
 
-#SAMOTNÝ PRŮBĚH KÓDU
+#SAMOTNÉ VYUŽITÍ FUNKCÍ
 #názvy vstupních souborů
 conteiners = "kontejnery.geojson"
 adress = "adresy.geojson"
