@@ -34,34 +34,33 @@ def getDataContainers(inputContainers):
     containers = {}
     for feature in inputContainers:
         fullAdress = feature["properties"]["STATIONNAME"]
-        wgsCO = feature["geometry"]["coordinates"]
+        jtskCO = feature["geometry"]["coordinates"]
         if feature["properties"]["PRISTUP"] == "volně": # výběr pouze těch kontejnerů, které mají volný přístup
-            containers[fullAdress] = wgsCO
+            containers[fullAdress] = jtskCO
     return containers
 
 #VÝPOČET VZDÁLENOSTI OD ADRES K NEJBLIŽŠÍMU VEŘEJNÉMU KONTEJNERU
-def distance(adress, containers):
+def distance(adress, containers, permissibleDis):
     distances = {}
     for (adressesAd, coordinatesAd) in adress.items():
-        onGoing = 10000 #proměnná s, která bude přepisována dle 
         for coordinatesCo in containers.values():
             finalDistance = sqrt(((coordinatesAd[0] - coordinatesCo[0])**2) + ((coordinatesAd[1] - coordinatesCo[1])**2)) #výpočet vzdálenosti na základě Pythagovovi věty
-            if (finalDistance < onGoing): #neustále se zjišťuje vzdálenost k nejbližšímu kontejneru a přepíše se v proměnné onGoing
-                onGoing = finalDistance
-        if (onGoing >= 10000): #v případě vzdálenosti ke kontejneru větší než 10 km, program skončí
+            if (finalDistance < permissibleDis): #neustále se zjišťuje vzdálenost k nejbližšímu kontejneru a přepíše se v proměnné permissibleDis
+                permissibleDis = finalDistance
+        if (permissibleDis >= 10000): #v případě vzdálenosti ke kontejneru větší než 10 km, program skončí
             print(f"Vzdálenost veřejného kontejneru od adresy {adressesAd} je větší než 10 km.")
             print("!!!Program končí!!!")   
             exit()
-        distances[adressesAd] = onGoing #každá asresa se spojí vždy s nejbližší vzdáleností k veřejnému kontejneru
+        distances[adressesAd] = permissibleDis #každá asresa se spojí vždy s nejbližší vzdáleností k veřejnému kontejneru
     return distances
 
 #VÝBĚR NEJVZDÁLENĚJŠÍHO KONTEJNERU
-def maxDistance(distances,maximDistance):
-     #získání největší vzdálenosti nejbližšího kontejneru z výběru adres
+def maxDistance(distances):
+    maximDistance = max(takeDistances.values()) #získání největší vzdálenosti nejbližšího kontejneru z výběru adres
     for (adress, dis) in distances.items(): #cyklus, který zjistí na základě rovnosti adresu dle proměnné maximDistance
         if dis == maximDistance:
             maxstreet = adress
-    return maxstreet
+    return maxstreet, maximDistance
 
 #MEDIÁN
 def median(distances):
@@ -81,6 +80,7 @@ def median(distances):
     return medValue
 
 #SAMOTNÉ VYUŽITÍ FUNKCÍ
+permissibleDis = 10000 #maximální vzdálenost kontejnerů braných v úvahu
 #názvy vstupních souborů
 containers = "kontejnery.geojson"
 adress = "adresy.geojson"
@@ -96,14 +96,13 @@ generalizeAdress = getDataAdress(adress,wgs2jtsk)
 generalizeContainers = getDataContainers(containers)
 
 
-takeDistances = distance(generalizeAdress,generalizeContainers) #výpočet vzdáleností na základě výše popsané vunkce
-maximDistance = max(takeDistances.values())
+takeDistances = distance(generalizeAdress,generalizeContainers, permissibleDis) #výpočet vzdáleností na základě výše popsané vunkce
 averageDistance = sum(takeDistances.values()) / len(takeDistances) #průměr všech nejbližších vzáleností
-maxstreet = maxDistance(takeDistances,maximDistance)
+maxstreet = maxDistance(takeDistances)
 
 #tisk všech výstupů
 print(f"Nacteno {len(generalizeAdress)} adresnich bodu.")
 print(f"Nacteno {len(generalizeContainers)} kontejneru na trideny odpad.\n")
 print(f"Prumerna vzdalenost ke kontejneru je {median(takeDistances):.0f} m.") #vstup do mediánu z prověné takeDistances
 print(f"Medián vzdálenosti ke kontejneru je {averageDistance:.0f} m.")
-print(f"Nejdale ke kontejneru je z adresy {maxstreet} a to {maximDistance:.0f} m.\n")
+print(f"Nejdale ke kontejneru je z adresy {maxstreet[0]} a to {maxstreet[1]:.0f} m.\n")
