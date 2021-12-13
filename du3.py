@@ -1,6 +1,21 @@
 from pyproj import Transformer, CRS
 import json
 from math import sqrt
+import argparse
+
+#názvy vstupních souborů
+containers = "kontejnery.geojson"
+adress = "adrsy.geojson"
+
+#PŘEDÁNÍ PARAMETRŮ
+parameters = argparse.ArgumentParser(description='Výpočet vzdálenosti ke kontejneru od jednotlivých adres')
+parameters.add_argument('-a', '--adresy', type = str, required = False, help = 'soubor s adresními body ve formátu GEOJSON')
+parameters.add_argument('-k', '--kontejnery', type = str, required = False, help = 'soubor s kontejnery ve formátu GEOJSON')
+args = parameters.parse_args()
+if args.adresy is not None: #dvojitý zápor, takže pokud existuje zadaný parametr
+    adress = args.adresy #zapíše se do proměné adresy
+elif args.kontejnery is not None:
+    containers = args.kontejnery
 
 #FUNKCE PRO NAČTENÍ GEOJSONU
 def loadGeoJson(inputJSON):
@@ -80,10 +95,7 @@ def median(distances):
     return medValue
 
 #SAMOTNÉ VYUŽITÍ FUNKCÍ
-permissibleDis = 10000 #maximální vzdálenost kontejnerů braných v úvahu
-#názvy vstupních souborů
-containers = "kontejnery.geojson"
-adress = "adresy.geojson"
+PERMISSIBLEDIS = 10000 #maximální vzdálenost kontejnerů braných v úvahu
 
 #načtení vstupních souborů
 containers = loadGeoJson(containers)
@@ -96,7 +108,7 @@ generalizeAdress = getDataAdress(adress,wgs2jtsk)
 generalizeContainers = getDataContainers(containers)
 
 
-takeDistances = distance(generalizeAdress,generalizeContainers, permissibleDis) #výpočet vzdáleností na základě výše popsané vunkce
+takeDistances = distance(generalizeAdress,generalizeContainers, PERMISSIBLEDIS) #výpočet vzdáleností na základě výše popsané vunkce
 averageDistance = sum(takeDistances.values()) / len(takeDistances) #průměr všech nejbližších vzáleností
 maxstreet = maxDistance(takeDistances)
 
