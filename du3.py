@@ -55,16 +55,17 @@ def getDataContainers(inputContainers):
 #VÝPOČET VZDÁLENOSTI OD ADRES K NEJBLIŽŠÍMU VEŘEJNÉMU KONTEJNERU
 def distance(adress, containers, PERMISSIBLE_DIS):
     distances = {}
+    minValue = PERMISSIBLE_DIS
     for (adressesAd, coordinatesAd) in adress.items():
         for coordinatesCo in containers.values():
             finalDistance = sqrt(((coordinatesAd[0] - coordinatesCo[0])**2) + ((coordinatesAd[1] - coordinatesCo[1])**2)) #výpočet vzdálenosti na základě Pythagovovi věty
-            if (finalDistance < PERMISSIBLE_DIS): #neustále se zjišťuje vzdálenost k nejbližšímu kontejneru a přepíše se v proměnné PERMISSIBLE_DIS
-                PERMISSIBLE_DIS = finalDistance
-        if (PERMISSIBLE_DIS >= 10000): #v případě vzdálenosti ke kontejneru větší než 10 km, program skončí
+            if (finalDistance < minValue): #neustále se zjišťuje vzdálenost k nejbližšímu kontejneru a přepíše se v proměnné PERMISSIBLE_DIS
+                minValue = finalDistance
+        if (minValue >= PERMISSIBLE_DIS): #v případě vzdálenosti ke kontejneru větší než 10 km, program skončí
             print(f"Vzdálenost veřejného kontejneru od adresy {adressesAd} je větší než 10 km.")
             print("!!!Program končí!!!")   
             exit()
-        distances[adressesAd] = PERMISSIBLE_DIS #každá asresa se spojí vždy s nejbližší vzdáleností k veřejnému kontejneru
+        distances[adressesAd] = minValue #každá asresa se spojí vždy s nejbližší vzdáleností k veřejnému kontejneru
     return distances
 
 #VÝBĚR NEJVZDÁLENĚJŠÍHO KONTEJNERU
