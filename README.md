@@ -12,7 +12,7 @@ V první části programu je vytvořena funkce loadJSON, která je určena pro n
 getDataAdress je funkcí, která vybírá a slučuje adresy s domovními čísly ze vstupního souboru. Výstupem jsou adresy jednotlivých staveb společně s jejich lokalizací v systému JTSK uložené ve slovníku. Souřadnice v podobě JTSK jsou získávány pomocí modulu pyproj a funkce transform.
 
 ## Výběr a úprava atributů v souboru s kontejnery
-Funkce getDataConteiners je funkčně obdobou funkce getDataAdress. Program vybírá adresu kontejneru, která v tomto případě nevyžaduje úpravy souřadnice daného kontejneru. Podmínka zajišťuje, že do konečného souboru jsou zapsány pouze ty kontejnery, které jsou volně přístupné.
+Funkce getDataContainers je funkčně obdobou funkce getDataAdress. Program vybírá adresu kontejneru, která v tomto případě nevyžaduje úpravy souřadnice daného kontejneru. Podmínka zajišťuje, že do konečného souboru jsou zapsány pouze ty kontejnery, které jsou volně přístupné.
 
 ## Výpočet vzdálenosti od adres k nejbližšímu veřejnému kontejneru
 Do funkce s názvem distance vstupují proměnné adresy a kontejnery, které vznikly v rámci předchozích dvou funkcí. Jednotlivé adresní body společně s jejich souřadnicemi vstupují do FOR cyklu, který obsahuje vnořený FOR cyklus s procházením jednotlivých kontejnerů a vybírá nejbližší k dané adrese. Vzdálenost je zjištěna pomocí Pythagorovy věty. Program je ukončen v případě, že nejbližší vzdálenost některého adresního bodu ke kontejneru je větší než 10 km.
