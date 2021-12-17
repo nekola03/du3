@@ -78,12 +78,6 @@ def maxDistance(distances):
 
 #MEDIÁN
 def median(distances):
-    """
-    distancesList = [] 
-    for (_,dis) in distances.items(): #pro snazší práci se vybere ze slovníku pouze vzdálenost a zapíše do pole
-        distancesList.append(dis)
-    distancesList.sort() #sezaření vzestupně
-    """
     distancesList = sorted(list(distances.values()))
     if ((len(distancesList) % 2) == 0): #výpočet pozic okolních hodnot mediánu v případě sudého počtu hodnot 
         medPositionLower = (len(distancesList)) // 2
